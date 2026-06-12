@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<ProjectType>SourceGeneration</ProjectType>
+		<LangVersion>latest</LangVersion>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsRoslynComponent>true</IsRoslynComponent>
+
+		<!-- ✅ Previene que el DLL se incluya como referencia normal -->
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+
+		<!-- ✅ Previene generar un paquete NuGet standalone -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>false</IsPackable>
+
+		<!-- ✅ NO generar símbolos (no aplica a source generators) -->
+		<IncludeSymbols>false</IncludeSymbols>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Provider\HttpProvider.cs~RF176e12d.TMP" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+	</ItemGroup>
+
+	<!-- ❌ ELIMINAR ESTO: Esto causa que se genere un paquete -->
+	<!-- <ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	</ItemGroup> -->
+
+</Project>

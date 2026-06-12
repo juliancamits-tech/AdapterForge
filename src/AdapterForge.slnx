@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AdapterForge.SourceGenerator/SourceGenerator.csproj" />
+  <Project Path="TestApi/TestApi.csproj" />
+  <Project Path="AdapterForge.Abstractions/AdapterForge.Abstractions.csproj" Id="ce41f21d-f224-42bf-aded-c68f5b365258" />
+</Solution>
