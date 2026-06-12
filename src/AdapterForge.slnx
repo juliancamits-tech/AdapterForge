@@ -1,5 +1,6 @@
 <Solution>
-  <Project Path="AdapterForge.SourceGenerator/SourceGenerator.csproj" />
-  <Project Path="TestApi/TestApi.csproj" />
   <Project Path="AdapterForge.Abstractions/AdapterForge.Abstractions.csproj" Id="ce41f21d-f224-42bf-aded-c68f5b365258" />
+  <Project Path="AdapterForge.Analyzer/AdapterForge.Analyzer.csproj" Id="9895c735-d389-4b82-8956-aeeb875ac69c" />
+  <Project Path="AdapterForge.SourceGenerator/AdapterForge.SourceGenerator.csproj" />
+  <Project Path="TestApi/TestApi.csproj" />
 </Solution>

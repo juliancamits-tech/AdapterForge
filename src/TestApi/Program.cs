@@ -1,5 +1,4 @@
 using AdapterForge.Http.Generated;
-using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
