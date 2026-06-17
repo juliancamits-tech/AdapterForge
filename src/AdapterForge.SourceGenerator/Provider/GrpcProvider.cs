@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using AdapterForge.SourceGenerator.AdapterForgeOperation;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -16,7 +17,7 @@ internal static class GrpcProvider
 
         sb.AppendLine("syntax = \"proto3\";");
         sb.AppendLine();
-        
+
         sb.AppendLine($"package adapterforge.{firstValidItem.Group.ToLowerInvariant()};");
         sb.AppendLine();
 

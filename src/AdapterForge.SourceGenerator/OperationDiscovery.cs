@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using AdapterForge.SourceGenerator.AdapterForgeOperation;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using System.Threading;
@@ -116,7 +117,7 @@ namespace SourceGenerator
                             break;
 
                         case "Mcp":
-                            metadata.Mcp = true;
+                            metadata.Mcp = GetMcpDefinition(invocation);
                             break;
 
                         case "Grpc":
@@ -146,18 +147,152 @@ namespace SourceGenerator
                     .Trim('"');
             }
 
-            private static HttpMethod GetHttpMethod(InvocationExpressionSyntax invocation)
+            private static McpDefinition GetMcpDefinition(InvocationExpressionSyntax invocation)
             {
-                var verb = invocation.ArgumentList.Arguments.FirstOrDefault().ToString().Split('.').Last();
-
-                return verb switch
+                var isReadOnly = "false";
+                var isDestructive = "true";
+                var isIdempotent = "false";
+                var openWorld = "false";
+                for (int x = 0; x < invocation.ArgumentList.Arguments.Count; x++)
                 {
-                    "GET" => HttpMethod.GET,
-                    "POST" => HttpMethod.POST,
-                    "PUT" => HttpMethod.PUT,
-                    "DELETE" => HttpMethod.DELETE,
-                    _ => HttpMethod.NONE,
-                };
+                    var arg = invocation.ArgumentList.Arguments[x];
+                    // Verificar si el argumento tiene nombre (named argument)
+                    if (arg.NameColon != null)
+                    {
+                        // Es un argumento nombrado: authorization: "value"
+                        var paramName = arg.NameColon.Name.Identifier.Text;
+                        var paramValue = arg.Expression.ToString().ToLowerInvariant();
+
+                        switch (paramName)
+                        {
+                            case "isReadOnly":
+                                isReadOnly = paramValue;
+                                break;
+                            case "isDestructive":
+                                isDestructive = paramValue;
+                                break;
+                            case "isIdempotent":
+                                isIdempotent = paramValue;
+                                break;
+                            case "openWorld":
+                                openWorld = paramValue;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Es un argumento posicional
+                        var argValue = arg.ToString().ToLowerInvariant();
+
+                        switch (x)
+                        {
+                            case 0:
+                                isReadOnly = argValue;
+                                break;
+                            case 1:
+                                isDestructive = argValue;
+                                break;
+                            case 2:
+                                isIdempotent = argValue;
+                                break;
+                            case 3:
+                                openWorld = argValue;
+                                break;
+                        }
+                    }
+                }
+
+                var def = new McpDefinition();
+                def.IsReadOnly = isReadOnly;
+                def.IsDestructive = isDestructive;
+                def.IsIdempotent = isIdempotent;
+                def.OpenWorld = openWorld;
+
+                return def;
+            }
+
+            private static HttpDefinition GetHttpMethod(InvocationExpressionSyntax invocation)
+            {
+                var arguments = invocation.ArgumentList.Arguments;
+
+                // Variables para almacenar los valores
+                string httpVerb = null;
+                string authorization = null;
+                string summary = null;
+
+                foreach (var arg in arguments)
+                {
+                    // Verificar si el argumento tiene nombre (named argument)
+                    if (arg.NameColon != null)
+                    {
+                        // Es un argumento nombrado: authorization: "value"
+                        var paramName = arg.NameColon.Name.Identifier.Text;
+                        var paramValue = arg.Expression.ToString().Trim('"');
+
+                        switch (paramName)
+                        {
+                            case "httpMethod":
+                                httpVerb = paramValue.Split('.').Last();
+                                break;
+                            case "authorization":
+                                authorization = paramValue;
+                                break;
+                            case "summary":
+                                summary = paramValue;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Es un argumento posicional
+                        var argValue = arg.ToString();
+
+                        // El primer argumento posicional es httpMethod (obligatorio)
+                        if (httpVerb == null)
+                        {
+                            httpVerb = argValue.Split('.').Last();
+                        }
+                        // El segundo argumento posicional es authorization (opcional)
+                        else if (authorization == null && !argValue.StartsWith("\""))
+                        {
+                            authorization = argValue.Trim('"');
+                        }
+                        // El tercer argumento posicional es summary (opcional)
+                        else if (summary == null)
+                        {
+                            summary = argValue.Trim('"');
+                        }
+                    }
+                }
+
+                var def = new HttpDefinition();
+                // Asignar el verbo HTTP
+                if (httpVerb != null)
+                {
+                    switch (httpVerb)
+                    {
+                        case "GET":
+                            def.Verb = HttpMethod.GET;
+                            break;
+                        case "POST":
+                            def.Verb = HttpMethod.POST;
+                            break;
+                        case "PUT":
+                            def.Verb = HttpMethod.PUT;
+                            break;
+                        case "DELETE":
+                            def.Verb = HttpMethod.DELETE;
+                            break;
+                    }
+                }
+
+                // Guardar authorization y summary en HttpDefinition
+                if (authorization is not null)
+                    def.Authorization = authorization;
+
+                def.Summary = summary;
+
+                return def;
             }
         }
 

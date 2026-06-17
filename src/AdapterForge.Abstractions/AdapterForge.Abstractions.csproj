@@ -4,7 +4,45 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+
+		<!-- Tratar warnings como errores en proyectos empaquetables -->
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<AnalysisMode>All</AnalysisMode>
+		<!-- Ensure the main assembly is built before packaging -->
+		<GeneratePackageOnBuild Condition="'$(BuildingInsideVisualStudio)' != 'true'">true</GeneratePackageOnBuild>
+
+		<!-- Facilita el debugging del dev, dando acceso al codigo -->
+		<DebugType>portable</DebugType>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+
+		<!-- Package metadata -->
+		<Version>10.0.0</Version>
+		<Authors>Julian Camits</Authors>
+		<Company></Company>
+		<Copyright>Copyright © $([System.DateTime]::Now.Year)</Copyright>
+		<RepositoryUrl>https://github.com/juliancamits-tech</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/juliancamits-tech</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryType>git</RepositoryType>
+		<PackageId>AdapterForge</PackageId>
+		<PackageTags>enum;enums;source-generator;roslyn;analyzer;enum-extensions;performance;compile-time;code-generation;frozen-dictionary;dotnet;csharp</PackageTags>
+		<PackageReadmeFile>AdapterForge_en.md</PackageReadmeFile>
 	</PropertyGroup>
+
+	<!--Source Link para todos los proyectos empaquetables -->
+	<ItemGroup Condition="'$(ProjectType)' == 'Package'">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\docs\packages\AdapterForge_en.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 	<!-- Referencia al proyecto Source Generators (solo para build-time, el pack lo maneja el None item) -->
 	<ItemGroup Label="Source Generators">

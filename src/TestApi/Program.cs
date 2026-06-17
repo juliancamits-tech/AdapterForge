@@ -20,11 +20,7 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddMcpServer()
-  .WithHttpTransport(opt =>
-  { 
-      opt.Stateless = true;
-  }
-  )
+  .WithHttpTransport()
   .WithToolsFromAssembly();
 
 builder.Services.AddOpenApi();

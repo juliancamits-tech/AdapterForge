@@ -1,38 +1,37 @@
-﻿using Bogus;
-using YAAF.Abstractions;
+﻿using AdapterForge.Abstractions;
+using Bogus;
 
-namespace TestApi
+namespace TestApi;
+
+public class GetClients : AdapterForgeOperation<GetClientsRequest, ClientsDto>
 {
-    public class GetClients : AdapterForgeOperation<GetClientsRequest, ClientsDto>
+    protected override void Configure(OperationBuilder builder)
     {
-        protected override void Configure(OperationBuilder builder)
-        {
-            builder
-           .Group("Client")
-           .Name("GetClients")
-           .Description("Obtiene a todos los clientes")
-           .Http(YAAF.Abstractions.HttpMethod.GET)
-           .Mcp()
-           ;
-        }
-
-        public ClientsDto Execute(GetClientsRequest request)
-        {
-            var dto = new ClientsDto();
-            var f = new Faker();
-            for (int x = 0; x < Random.Shared.Next(1, 10); x++)
-                dto.Names.Add(f.Name.FullName());
-
-            return dto;
-        }
-
-    }
-    public class GetClientsRequest
-    {
+        builder
+       .Group("Client")
+       .Name("GetClients")
+       .Description("Obtiene a todos los clientes")
+       .Http(AdapterForge.Abstractions.HttpMethod.GET)
+       .Mcp()
+       ;
     }
 
-    public class ClientsDto
+    public ClientsDto Execute(GetClientsRequest request)
     {
-        public List<string> Names { get; set; } = [];
+        var dto = new ClientsDto();
+        var f = new Faker();
+        for (int x = 0; x < Random.Shared.Next(1, 10); x++)
+            dto.Names.Add(f.Name.FullName());
+
+        return dto;
     }
+
+}
+public class GetClientsRequest
+{
+}
+
+public class ClientsDto
+{
+    public List<string> Names { get; set; } = [];
 }

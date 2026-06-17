@@ -1,11 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using AdapterForge.SourceGenerator.AdapterForgeOperation;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using SourceGenerator.Provider;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -47,10 +44,10 @@ namespace SourceGenerator
             {
                 var auch = operations.ToImmutableArray();
                 var result = HttpProvider.GenerateHttpFile(auch);
-                SaveFile(result, $"Http{operations.Key}","cs", context);
-                
+                SaveFile(result, $"Http{operations.Key}", "cs", context);
+
                 result = McpProvider.GenerateMcpFile(auch);
-                SaveFile(result, $"Mcp{operations.Key}","cs", context);
+                SaveFile(result, $"Mcp{operations.Key}", "cs", context);
 
                 //result = gRpcProvider.GenerateProtoFile(auch);
                 //SaveFile(result, $"{operations.Key}Grpc","proto", context);
@@ -59,7 +56,7 @@ namespace SourceGenerator
             SaveFile(HttpProvider.GenerateUnionFile(), "HttpAdapterForge", "cs", context);
         }
 
-        private static bool SaveFile(string fileBody, string fileName,string extension, SourceProductionContext context)
+        private static bool SaveFile(string fileBody, string fileName, string extension, SourceProductionContext context)
         {
             if (string.IsNullOrEmpty(fileBody))
                 return false;

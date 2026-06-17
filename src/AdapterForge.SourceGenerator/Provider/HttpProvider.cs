@@ -1,5 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using AdapterForge.SourceGenerator.AdapterForgeOperation;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -62,7 +62,7 @@ namespace SourceGenerator.Provider
 
         public static string GenerateHttpFile(ImmutableArray<OperationDefinition> operationDefinitions)
         {
-            var firstValidItem = operationDefinitions.FirstOrDefault(x => x.Http != HttpMethod.NONE);
+            var firstValidItem = operationDefinitions.FirstOrDefault(x => x.Http != null);
             if (firstValidItem is null)
                 return string.Empty;
 
@@ -128,7 +128,7 @@ namespace SourceGenerator.Provider
                     sbParams.Append($"[FromServices] {item.Type} {item.Text}");
                 }
 
-                switch (operation.Http)
+                switch (operation.Http.Verb)
                 {
                     case HttpMethod.POST:
                         sb.AppendLine($"        app.MapPost(\"/api/{group.ToLowerInvariant()}/{operation.ClassName.ToLower()}\",");
@@ -164,6 +164,14 @@ namespace SourceGenerator.Provider
                 }
 
                 sb.AppendLine($"                   .WithDescription(\"{operation.Description}\")");
+                sb.AppendLine($"                   .WithSummary(\"{operation.Http.Summary}\")");
+                if (operation.Http.Authorization is not null)
+                {
+                    if (operation.Http.Authorization.Length > 0)
+                        sb.AppendLine($"                   .RequireAuthorization(\"{operation.Http.Authorization}\")");
+                    else
+                        sb.AppendLine($"                   .RequireAuthorization()");
+                }
                 sb.AppendLine("                        ;");
             }
             sb.AppendLine();

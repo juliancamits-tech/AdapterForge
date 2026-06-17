@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace YAAF.Abstractions
+﻿namespace AdapterForge.Abstractions
 {
     public enum HttpMethod
     {

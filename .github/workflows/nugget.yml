@@ -1,0 +1,220 @@
+name: AdapterForge
+
+# =========================================================
+# CONFIG
+# =========================================================
+
+env:
+  DOTNET_VERSION: "10.0.x"
+
+  PROJECT_PATH: "./src/BetterEnums/AdapterForge.Abstractions/AdapterForge.Abstractions.csproj"
+
+  PACKAGE_ID: "AdapterForge"
+
+  BUILD_CONFIGURATION: "Release"
+
+  OUTPUT_PATH: "./nugets"
+
+# =========================================================
+# TRIGGERS
+# =========================================================
+
+on:
+  push:
+    branches:
+      - main
+
+    paths:
+      - 'src/AdapterForge/**'
+      - '.github/workflows/nugget.yml'
+
+# =========================================================
+# OIDC / TRUSTED PUBLISHER
+# =========================================================
+
+permissions:
+  id-token: write
+  contents: write
+
+# =========================================================
+# JOBS
+# =========================================================
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+
+      # =====================================================
+      # CHECKOUT
+      # =====================================================
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      # =====================================================
+      # DEBUG
+      # =====================================================
+
+      - name: Debug GitHub Context
+        run: |
+          echo "REPOSITORY=$GITHUB_REPOSITORY"
+          echo "WORKFLOW=$GITHUB_WORKFLOW"
+          echo "WORKFLOW_REF=$GITHUB_WORKFLOW_REF"
+          echo "REF=$GITHUB_REF"
+
+      # =====================================================
+      # SETUP .NET
+      # =====================================================
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # =====================================================
+      # CACHE NUGET
+      # =====================================================
+
+      - name: Cache NuGet Packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles(env.PROJECT_PATH) }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # =====================================================
+      # EXTRACT VERSION
+      # =====================================================
+
+      - name: Extract Package Version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep -oPm1 '(?<=<Version>)[^<]+' "${{ env.PROJECT_PATH }}" || \
+          grep -oPm1 '(?<=<VersionPrefix>)[^<]+' "${{ env.PROJECT_PATH }}")
+
+          if [ -z "$VERSION" ]; then
+            echo "Version not found in csproj"
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION"
+
+          echo "current_version=$VERSION" >> $GITHUB_OUTPUT
+
+      # =====================================================
+      # CHECK NUGET EXISTENCE
+      # =====================================================
+
+      - name: Check If Package Already Exists
+        id: nuget_check
+        shell: bash
+        run: |
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://api.nuget.org/v3-flatcontainer/${{ env.PACKAGE_ID }}/${{ steps.version.outputs.current_version }}/index.json)
+
+          echo "NuGet Status: $STATUS_CODE"
+
+          if [ "$STATUS_CODE" = "200" ]; then
+            echo "Package already exists"
+
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      # =====================================================
+      # RESTORE
+      # =====================================================
+
+      - name: Restore
+        if: steps.nuget_check.outputs.skip == 'false'
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }}
+
+      # =====================================================
+      # BUILD
+      # =====================================================
+
+      - name: Build
+        if: steps.nuget_check.outputs.skip == 'false'
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} \
+            -c ${{ env.BUILD_CONFIGURATION }} \
+            --no-restore
+
+      # =====================================================
+      # PACK
+      # =====================================================
+
+      - name: Pack
+        if: steps.nuget_check.outputs.skip == 'false'
+        run: |
+          dotnet pack ${{ env.PROJECT_PATH }} \
+            -c ${{ env.BUILD_CONFIGURATION }} \
+            --no-build \
+            -o ${{ env.OUTPUT_PATH }}
+
+      # =====================================================
+      # LIST GENERATED PACKAGES
+      # =====================================================
+
+      - name: List Packages
+        if: steps.nuget_check.outputs.skip == 'false'
+        run: |
+          ls -la ${{ env.OUTPUT_PATH }}
+
+      # ===================================================== 
+      # NUGET LOGIN (OIDC) 
+      # ===================================================== 
+      
+      - name: NuGet Login 
+        if: steps.nuget_check.outputs.skip == 'false'
+        uses: NuGet/login@v1 
+        id: login
+        with: 
+          user: JulianCamits
+
+      # =====================================================
+      # PUBLISH
+      # =====================================================
+
+      - name: Publish To NuGet
+        if: steps.nuget_check.outputs.skip == 'false'
+        env:
+          NUGET_EXPERIMENTAL_CHAIN_BUILD_RETRY_POLICY: 9,1000
+        run: |
+          dotnet nuget push "${{ env.OUTPUT_PATH }}/*.nupkg" \
+            --api-key ${{steps.login.outputs.NUGET_API_KEY}} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      # =====================================================
+      # CREATE TAG
+      # =====================================================
+
+      - name: Create Git Tag
+        if: steps.nuget_check.outputs.skip == 'false'
+        run: |
+          TAG="v${{ steps.version.outputs.current_version }}"
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag already exists"
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi

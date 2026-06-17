@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AdapterForge.SourceGenerator.AdapterForgeOperation;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -10,7 +9,7 @@ namespace SourceGenerator.Provider
     {
         public static string GenerateMcpFile(ImmutableArray<OperationDefinition> operationDefinitions)
         {
-            var firstValidItem = operationDefinitions.FirstOrDefault(x => x.Mcp);
+            var firstValidItem = operationDefinitions.FirstOrDefault(x => x.Mcp is not null);
             if (firstValidItem is null)
                 return string.Empty;
 
@@ -49,11 +48,16 @@ namespace SourceGenerator.Provider
                 sbParams.Append($"{item.Type} {item.Text}");
             }
 
-            sb.AppendLine($"     [McpServerTool, Description(\"{operation.Description}\")]");
-            sb.AppendLine($"    public static {operation.ResponseType} {operation.ClassName}(");
-            sb.AppendLine($"{operation.RequestType} request, ");
-            sb.AppendLine($"{operation.FullClassName} operation");
-            sb.AppendLine($"{sbParams})");
+            sb.AppendLine($"    [McpServerTool");
+            sb.AppendLine($"    (");
+            sb.AppendLine($"    ReadOnly = {operation.Mcp.IsReadOnly},");
+            sb.AppendLine($"    Destructive = {operation.Mcp.IsDestructive},");
+            sb.AppendLine($"    Idempotent = {operation.Mcp.IsIdempotent},");
+            sb.AppendLine($"    OpenWorld = {operation.Mcp.OpenWorld},");
+            sb.AppendLine($"    OutputSchemaType = typeof({operation.ResponseType})");
+            sb.AppendLine("     )]");
+            sb.AppendLine($"    [Description(\"{operation.Description}\")]");
+            sb.AppendLine($"    public static {operation.ResponseType} {operation.ClassName}({operation.RequestType} request, {operation.FullClassName} operation{sbParams})");
             sb.AppendLine("     {");
             sb.AppendLine($"        return operation.Execute(request{sbFunction});");
             sb.AppendLine("     }");

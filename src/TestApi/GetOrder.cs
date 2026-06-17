@@ -1,6 +1,6 @@
-﻿using Bogus;
+﻿using AdapterForge.Abstractions;
+using Bogus;
 using Microsoft.Extensions.Caching.Memory;
-using YAAF.Abstractions;
 
 namespace TestApi
 {
@@ -12,7 +12,7 @@ namespace TestApi
                 .Group("Order")
                 .Name("GetOrder")
                 .Description("Obtiene una orden por su identificador")
-                .Http(YAAF.Abstractions.HttpMethod.GET)
+                .Http(AdapterForge.Abstractions.HttpMethod.GET, summary: "Obtener order x identificador")
                 .Mcp()
                 ;
         }

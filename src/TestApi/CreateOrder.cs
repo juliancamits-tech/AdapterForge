@@ -1,6 +1,4 @@
-﻿using Bogus;
-using Microsoft.Extensions.Caching.Memory;
-using YAAF.Abstractions;
+﻿using AdapterForge.Abstractions;
 
 namespace TestApi
 {
@@ -12,14 +10,14 @@ namespace TestApi
                 .Group("Order")
                 .Name("CreateOrder")
                 .Description("Crea una nueva orden recibiendo una lista de productos")
-                .Http(YAAF.Abstractions.HttpMethod.POST)
+                .Http(AdapterForge.Abstractions.HttpMethod.POST)
                 .Mcp()
                 ;
         }
 
-        public CreateOrderDto Execute(CreateOrderRequest request, IConfiguration configuration)
+        public CreateOrderDto Execute(IConfiguration configuration, CreateOrderRequest request)
         {
-            return new() { OrderId = Random.Shared.Next(0,100)};
+            return new() { OrderId = Random.Shared.Next(0, 100) };
         }
     }
 
