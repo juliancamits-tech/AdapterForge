@@ -7,7 +7,7 @@ name: AdapterForge
 env:
   DOTNET_VERSION: "10.0.x"
 
-  PROJECT_PATH: "./src/BetterEnums/AdapterForge.Abstractions/AdapterForge.Abstractions.csproj"
+  PROJECT_PATH: "./src/AdapterForge.Abstractions/AdapterForge.Abstractions.csproj"
 
   PACKAGE_ID: "AdapterForge"
 
