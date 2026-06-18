@@ -25,7 +25,9 @@ on:
       - main
 
     paths:
-      - 'src/AdapterForge/**'
+      - 'src/AdapterForge.Abstractions/**'
+      - 'src/AdapterForge.Analyzer/**'
+      - 'src/AdapterForge.SourceGenerator/**'
       - '.github/workflows/nugget.yml'
 
 # =========================================================
