@@ -41,7 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\..\docs\packages\AdapterForge_en.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\docs\AdapterForge_en.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<!-- Referencia al proyecto Source Generators (solo para build-time, el pack lo maneja el None item) -->

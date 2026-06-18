@@ -8,20 +8,17 @@ namespace AdapterForge.Analyzer.MissingExecuteFunction
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MissingExecuteAnalyzer : DiagnosticAnalyzer
-    {
-        public const string DiagnosticId = Const.MissingExecuteId;
-
+    {        
         private static readonly LocalizableString Title = "Falta método Execute";
         private static readonly LocalizableString MessageFormat = "La clase '{0}' hereda de AdapterForgeOperation y debe declarar un método 'Execute'";
         private static readonly LocalizableString Description = "Las operaciones que heredan de AdapterForgeOperation deben exponer un método Execute(TRequest) que devuelva TResponse.";
-        private const string Category = "Usage";
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-            DiagnosticId,
+        private static readonly DiagnosticDescriptor Rule = new(
+            Const.Id.MissingExecuteId,
             Title,
             MessageFormat,
-            Category,
-            DiagnosticSeverity.Warning,
+            Const.Category.Error,
+            DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: Description);
 

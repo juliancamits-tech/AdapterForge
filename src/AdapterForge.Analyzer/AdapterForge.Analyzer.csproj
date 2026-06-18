@@ -31,11 +31,6 @@
 		<PackageReference Include="System.Collections.Immutable" Version="7.0.0" PrivateAssets="all" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="MissingExecuteFunction\" />
-	  <Folder Include="NewFolder\" />
-	</ItemGroup>
-
 	<!-- ❌ ELIMINAR ESTO: Esto causa que se genere un paquete -->
 	<!-- <ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />

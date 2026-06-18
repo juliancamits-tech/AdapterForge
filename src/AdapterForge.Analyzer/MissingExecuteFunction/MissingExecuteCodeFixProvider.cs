@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace AdapterForge.Analyzer.MissingExecuteFunction
 {
-    [ExportCodeFixProvider("AF001", LanguageNames.CSharp), Shared]
+    [ExportCodeFixProvider(Const.Id.MissingExecuteId, LanguageNames.CSharp), Shared]
     public class MissingExecuteCodeFixProvider : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(MissingExecuteAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(Const.Id.MissingExecuteId);
 
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

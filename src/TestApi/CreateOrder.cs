@@ -15,7 +15,7 @@ namespace TestApi
                 ;
         }
 
-        public CreateOrderDto Execute(IConfiguration configuration, CreateOrderRequest request)
+        public CreateOrderDto Execute(CreateOrderRequest request, IConfiguration configuration)
         {
             return new() { OrderId = Random.Shared.Next(0, 100) };
         }
