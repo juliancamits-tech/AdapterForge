@@ -18,6 +18,6 @@ Internally, AdapterForge uses Roslyn to generate code through Source Generators 
 
 
 
-[![NuGet Version](https://img.shields.io/nuget/v/YAMCqrs.Core.svg?style=flat-square)](https://www.nuget.org/packages/AdapterForge)
+[![NuGet Version](https://img.shields.io/nuget/v/AdapterForge.svg?style=flat-square)](https://www.nuget.org/packages/AdapterForge)
 
-[![NuGet Downloads](https://img.shields.io/nuget/dt/YAMCqrs.Core.svg?style=flat-square)](https://www.nuget.org/packages/AdapterForge)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AdapterForge.svg?style=flat-square)](https://www.nuget.org/packages/AdapterForge)
