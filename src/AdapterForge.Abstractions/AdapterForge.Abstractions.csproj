@@ -31,7 +31,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryType>git</RepositoryType>
 		<PackageId>AdapterForge</PackageId>
-		<PackageTags>enum;enums;source-generator;roslyn;analyzer;enum-extensions;performance;compile-time;code-generation;frozen-dictionary;dotnet;csharp</PackageTags>
+		<PackageTags>minimal-api;mcp;model-context-protocol;source-generator;roslyn;code-generation;dependency-injection;tooling;api;ai-tools</PackageTags>
 		<PackageReadmeFile>AdapterForge_en.md</PackageReadmeFile>
 	</PropertyGroup>
 
